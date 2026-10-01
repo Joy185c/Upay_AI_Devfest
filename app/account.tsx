@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image } from 'react-native';
 import { QrCode } from 'lucide-react-native';
 import { themeTokens } from '../theme/tokens';
 import { mockCustomer, mockWallets } from '../data/seededData';
@@ -30,7 +30,10 @@ export default function AccountScreen() {
         {/* User Profile Info Card */}
         <View style={styles.profileCard}>
           <View style={styles.avatarCircle}>
-            <Text style={styles.avatarText}>R</Text>
+            <Image 
+              source={require('../assets/profile.jpg')} 
+              style={{ width: 44, height: 44, borderRadius: 22 }} 
+            />
           </View>
           <View style={styles.userTextCol}>
             <Text style={styles.userName}>{mockCustomer.name}</Text>

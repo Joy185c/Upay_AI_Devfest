@@ -25,7 +25,10 @@ export const UpayHeader: React.FC = () => {
         {/* User Info */}
         <View style={styles.userInfoLeft}>
           <View style={styles.avatarCircle}>
-            <Text style={styles.avatarText}>R</Text>
+            <Image 
+              source={require('../../assets/profile.jpg')} 
+              style={{ width: 44, height: 44, borderRadius: 22 }} 
+            />
           </View>
           <View style={styles.userTextCol}>
             <Text style={styles.userName}>{mockCustomer.name}</Text>
