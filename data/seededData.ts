@@ -4,7 +4,7 @@ import { Campaign, Experiment, UpliftSegmentDetail, AbuseCluster, Transaction, M
 
 export const mockCustomer: Customer = {
   id: 'CUST-882194',
-  name: 'RAFIQUL ISLAM',
+  name: 'Joy Sarkar',
   phone: '01712345678',
   avatar: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
   region: 'Dhaka',
