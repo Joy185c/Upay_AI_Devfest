@@ -256,62 +256,7 @@ export const mockAbuseClusters: AbuseCluster[] = [
   },
 ];
 
-export const mockTransactions: Transaction[] = [
-  {
-    id: 'IIQ-20261001-8F31A',
-    type: 'pay_bill',
-    titleBn: 'মেক পেমেন্ট - ডেসকো বিদ্যুৎ বিল',
-    titleEn: 'Pay Bill - DESCO Electricity',
-    counterparty: 'DESCO Bill Pay',
-    amount: 1450.00,
-    fee: 0.00,
-    timestamp: '11:10 PM, 01 Oct 2026',
-    status: 'success',
-    walletType: 'primary',
-    impactIQSponsored: true,
-    whyOfferReasonBn: 'ইমপ্যাক্টআইকিউ ক্যাশব্যাক: আপনি Persuadable সেগমেন্টে আছেন!',
-    whyOfferReasonEn: 'ImpactIQ Cashback: You belong to the Persuadables segment!',
-  },
-  {
-    id: 'IIQ-20261001-7E12B',
-    type: 'recharge',
-    titleBn: 'মোবাইল রিচার্জ - গ্রামীণফোন',
-    titleEn: 'Mobile Recharge - Grameenphone',
-    counterparty: '01712345678',
-    amount: 200.00,
-    fee: 0.00,
-    timestamp: '08:45 PM, 01 Oct 2026',
-    status: 'success',
-    walletType: 'cash_reward',
-  },
-  {
-    id: 'IIQ-20260930-4C90X',
-    type: 'add_money',
-    titleBn: 'অ্যাড মানি - ব্যাংক ব্যাকলাইন',
-    titleEn: 'Add Money - Bank Card',
-    counterparty: 'City Bank **** 8362',
-    amount: 5000.00,
-    fee: 0.00,
-    timestamp: '03:15 PM, 30 Sep 2026',
-    status: 'success',
-    walletType: 'primary',
-  },
-  {
-    id: 'IIQ-20260928-1A05Z',
-    type: 'payment',
-    titleBn: 'মেক পেমেন্ট - ঢাকা ফ্রেশ মার্ট',
-    titleEn: 'Make Payment - Dhaka Fresh Mart',
-    counterparty: 'Dhaka Fresh Mart',
-    amount: 850.00,
-    fee: 0.00,
-    timestamp: '07:20 PM, 28 Sep 2026',
-    status: 'success',
-    walletType: 'primary',
-    impactIQSponsored: true,
-    whyOfferReasonBn: 'ইমপ্যাক্টআইকিউ মার্চেন্ট অফার ৫% ইনস্ট্যান্ট ব্যাক',
-    whyOfferReasonEn: 'ImpactIQ Merchant Offer 5% Instant Back',
-  },
-];
+export const mockTransactions: Transaction[] = [];
 
 export const mockMerchants: MerchantImpact[] = [
   {

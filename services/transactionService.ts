@@ -10,7 +10,7 @@ const STORAGE_TRANSACTIONS_KEY = 'upay_bd_transactions_v1';
 
 // Internal memory fallback if localStorage is restricted or unavailable
 let memoryBalance: number = DEFAULT_BALANCE;
-let memoryTransactions: Transaction[] = [...mockTransactions];
+let memoryTransactions: Transaction[] = [];
 
 const isBrowser = typeof window !== 'undefined' && typeof window.localStorage !== 'undefined';
 
@@ -139,9 +139,9 @@ export class TransactionService {
         console.error('Failed to parse stored transactions:', err);
       }
     }
-    // Seed default mock transactions if missing or corrupted
-    await this.saveTransactions(mockTransactions);
-    return [...mockTransactions];
+    // Return empty array if missing or absent
+    await this.saveTransactions([]);
+    return [];
   }
 
   /**
@@ -312,8 +312,8 @@ export class TransactionService {
     removeStorageItem(STORAGE_BALANCE_KEY);
     removeStorageItem(STORAGE_TRANSACTIONS_KEY);
     await this.setBalance(DEFAULT_BALANCE);
-    await this.saveTransactions(mockTransactions);
-    return { balance: DEFAULT_BALANCE, transactions: [...mockTransactions] };
+    await this.saveTransactions([]);
+    return { balance: DEFAULT_BALANCE, transactions: [] };
   }
 }
 
