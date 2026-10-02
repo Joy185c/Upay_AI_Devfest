@@ -10,7 +10,13 @@ import { useRouter } from 'expo-router';
 export const UpayHeader: React.FC = () => {
   const [showBalance, setShowBalance] = useState(false);
   const language = useAppStore((state) => state.language);
+  const balance = useAppStore((state) => state.balance);
+  const loadDemoState = useAppStore((state) => state.loadDemoState);
   const router = useRouter();
+
+  useEffect(() => {
+    loadDemoState();
+  }, [loadDemoState]);
 
   useEffect(() => {
     if (showBalance) {
@@ -42,9 +48,10 @@ export const UpayHeader: React.FC = () => {
             style={styles.balancePill}
             onPress={() => setShowBalance(!showBalance)}
             activeOpacity={0.8}
+            accessibilityLabel="Wallet Balance"
           >
             <Text style={styles.balancePillText}>
-              {showBalance ? formatCurrency(mockWallets.primary, language) : (language === 'bn' ? 'ব্যালেন্স' : 'Balance')}
+              {showBalance ? formatCurrency(balance, language) : (language === 'bn' ? 'ব্যালেন্স' : 'Balance')}
             </Text>
           </TouchableOpacity>
 

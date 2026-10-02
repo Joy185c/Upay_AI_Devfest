@@ -113,6 +113,26 @@ export default function MoreScreen() {
 
           <TouchableOpacity
             style={styles.rowItem}
+            onPress={async () => {
+              await useAppStore.getState().resetDemoState();
+              router.push('/history' as any);
+            }}
+            activeOpacity={0.7}
+            accessibilityLabel="Reset Demo Data"
+          >
+            <View style={[styles.iconBox, { backgroundColor: '#FFF8CE' }]}>
+              <RefreshCw size={18} color={themeTokens.brand.primaryDark} />
+            </View>
+            <Text style={[styles.rowLabel, { fontWeight: '800', color: themeTokens.brand.primaryDark }]}>
+              Reset Demo Data (10,000 BDT)
+            </Text>
+            <ChevronRight size={18} color={themeTokens.colors.textMuted} />
+          </TouchableOpacity>
+
+          <View style={styles.divider} />
+
+          <TouchableOpacity
+            style={styles.rowItem}
             onPress={() => router.push('/wheel' as any)}
             activeOpacity={0.7}
           >

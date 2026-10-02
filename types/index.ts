@@ -177,12 +177,15 @@ export interface Transaction {
   counterparty: string;
   amount: number;
   fee: number;
+  total?: number;
+  balanceAfter?: number;
   timestamp: string;
   status: 'success' | 'pending' | 'failed';
   walletType: 'primary' | 'disbursement' | 'secondary' | 'remittance' | 'cash_reward';
   impactIQSponsored?: boolean;
   whyOfferReasonBn?: string;
   whyOfferReasonEn?: string;
+  note?: string;
 }
 
 export interface MerchantImpact {

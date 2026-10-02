@@ -9,11 +9,12 @@ import { useRouter } from 'expo-router';
 
 export const UpayWalletCard: React.FC = () => {
   const language = useAppStore((state) => state.language);
+  const balance = useAppStore((state) => state.balance);
   const t = translations[language];
   const router = useRouter();
 
   const pastelCards = [
-    { title: t.primaryWallet, amount: mockWallets.primary, bg: themeTokens.wallets.primary, icon: Wallet, color: '#0B4DA2' },
+    { title: t.primaryWallet, amount: balance, bg: themeTokens.wallets.primary, icon: Wallet, color: '#0B4DA2' },
     { title: t.disbursementWallet, amount: mockWallets.disbursement, bg: themeTokens.wallets.disbursement, icon: ArrowDownLeft, color: '#E53E3E' },
     { title: t.secondaryWallet, amount: mockWallets.secondary, bg: themeTokens.wallets.secondary, icon: Landmark, color: '#8B5CF6' },
     { title: t.remittanceWallet, amount: mockWallets.remittance, bg: themeTokens.wallets.remittance, icon: HeartHandshake, color: '#00A859' },

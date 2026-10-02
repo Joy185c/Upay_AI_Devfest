@@ -1,18 +1,16 @@
-// ImpactIQ Customer Payment & Wallet Service
-
+// ImpactIQ Customer Payment & Wallet Service Wrapper
 import { Transaction } from '../types';
-import { mockTransactions, mockWallets } from '../data/seededData';
+import { transactionService, DEMO_PIN } from './transactionService';
+import { mockWallets } from '../data/seededData';
 
 export class PaymentService {
-  private wallets = { ...mockWallets };
-  private transactions = [...mockTransactions];
-
   async getWallets() {
-    return { ...this.wallets };
+    const primary = await transactionService.getBalance();
+    return { ...mockWallets, primary };
   }
 
   async getTransactions(): Promise<Transaction[]> {
-    return [...this.transactions];
+    return await transactionService.getTransactions();
   }
 
   async executePayment(params: {
@@ -22,42 +20,23 @@ export class PaymentService {
     counterparty: string;
     amount: number;
     fee?: number;
+    pin?: string;
     impactIQSponsored?: boolean;
     cashbackBDT?: number;
+    note?: string;
   }): Promise<Transaction> {
-    const fee = params.fee || 0;
-    const totalDeduction = params.amount + fee;
-    
-    // Deduct from primary wallet
-    this.wallets.primary = Math.max(0, this.wallets.primary - totalDeduction);
-    
-    // If cashback earned from ImpactIQ, credit to Cash Reward wallet
-    if (params.cashbackBDT && params.cashbackBDT > 0) {
-      this.wallets.cashReward += params.cashbackBDT;
-    }
-
-    const now = new Date();
-    const dateStr = now.toLocaleDateString('en-US', { day: '2-digit', month: 'short', year: 'numeric' });
-    const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
-
-    const newTx: Transaction = {
-      id: `IIQ-${now.getFullYear()}${String(now.getMonth() + 1).padStart(2, '0')}${String(now.getDate()).padStart(2, '0')}-${Math.random().toString(36).substring(2, 7).toUpperCase()}`,
+    const res = await transactionService.executeTransaction({
       type: params.type,
-      titleBn: params.titleBn,
       titleEn: params.titleEn,
+      titleBn: params.titleBn,
       counterparty: params.counterparty,
       amount: params.amount,
-      fee,
-      timestamp: `${timeStr}, ${dateStr}`,
-      status: 'success',
-      walletType: 'primary',
+      pin: params.pin || DEMO_PIN,
       impactIQSponsored: params.impactIQSponsored,
-      whyOfferReasonBn: params.cashbackBDT ? `ইমপ্যাক্টআইকিউ ক্যাশব্যাক ৳${params.cashbackBDT} ক্যাশ রিওয়ার্ড ওয়ালেটে জমা হয়েছে!` : undefined,
-      whyOfferReasonEn: params.cashbackBDT ? `ImpactIQ Cashback ৳${params.cashbackBDT} credited to Cash Reward!` : undefined,
-    };
-
-    this.transactions.unshift(newTx);
-    return newTx;
+      cashbackBDT: params.cashbackBDT,
+      note: params.note,
+    });
+    return res.transaction;
   }
 }
 

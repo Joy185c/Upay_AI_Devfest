@@ -10,6 +10,7 @@ import { useRouter } from 'expo-router';
 
 export default function AccountScreen() {
   const language = useAppStore((state) => state.language);
+  const balance = useAppStore((state) => state.balance);
   const t = translations[language];
   const router = useRouter();
 
@@ -41,7 +42,7 @@ export default function AccountScreen() {
           </View>
           <View style={styles.balanceRight}>
             <Text style={styles.balanceLabel}>{t.balance}</Text>
-            <Text style={styles.balanceVal}>{formatCurrency(mockWallets.primary, language)}</Text>
+            <Text style={styles.balanceVal}>{formatCurrency(balance, language)}</Text>
           </View>
         </View>
 

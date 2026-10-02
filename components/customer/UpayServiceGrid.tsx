@@ -30,6 +30,7 @@ export const UpayServiceGrid: React.FC = () => {
     { id: 'make-payment', label: t.makePayment, icon: QrCode, route: '/qr-scan', color: '#0B4DA2' },
     { id: 'pay-bill', label: t.payBill, icon: FileText, route: '/pay-bill', color: '#E53E3E' },
     { id: 'add-money', label: t.addMoney, icon: PlusCircle, route: '/add-money', color: '#00A859' },
+    { id: 'insights', label: language === 'bn' ? 'ইনসাইটস' : 'Insights', icon: PiggyBank, route: '/insights', color: '#0B4DA2' },
     { id: 'savings', label: t.savings, icon: PiggyBank, route: '/savings', color: '#8B5CF6' },
     { id: 'fund-transfer', label: t.fundTransfer, icon: ArrowRightLeft, route: '/fund-transfer', color: '#0B4DA2' },
     { id: 'request-money', label: t.requestMoney, icon: HandCoins, route: '/request-money', color: '#F59E0B' },
