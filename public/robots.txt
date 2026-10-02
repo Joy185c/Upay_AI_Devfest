@@ -1,0 +1,7 @@
+# Upay BD Robots.txt
+User-agent: *
+Allow: /
+Disallow: /demo-admin
+Disallow: /auth/
+
+Sitemap: https://upaybd.vercel.app/sitemap.xml

@@ -1,129 +1,126 @@
-# ImpactIQ - UPAY ⚡
+# Upay BD ⚡ — Production-Grade Mobile Wallet Application
 
-> **"Pay for impact, not for noise."**  
-> *Universal Causal AI & Uplift Modeling Engine integrated with a fully functional upay Mobile Banking Simulation & Live Supabase Backend.*
-
----
-
-## 📌 Executive Summary
-
-Most MFS marketing campaigns report **gross results**: *"Campaign users spent ৳18.5M"*. This overstates impact because many customers would have transacted anyway.
-
-**ImpactIQ - UPAY** answers the real question: **"What did this campaign actually cause?"**
-
-It measures **true incremental impact** (treatment vs. holdout control), predicts customer uplift using **4-quadrant causal modeling**, and provides a **full-featured simulated upay payment app** with live Supabase database sync, persistent wallet balance, transaction receipts, analytics insights, and PDF/CSV statement exports.
+> **Production-grade simulated mobile financial wallet with real Supabase Auth, Row-Level Security, atomic Postgres RPCs, hashed PIN authentication, Zod form validation, and automated CI/CD.**
 
 ---
 
-## 🚀 Quick Start
+## 📌 Production Architecture Overview
 
-### 1. Prerequisites
-- Node.js (v18+)
-- npm / npx
+Upay BD is structured as a **Mode A** production-grade simulated mobile payment application. While no real fiat money gateway keys are required, the entire backend enforcement, atomic transaction engine, user authentication, and data isolation adhere to strict production security standards.
 
-### 2. Run Local Web Server
+### 🛡️ Core Security Architecture & Enforcements
+- **Atomic Balance & Transfers**: All money transfers and wallet mutations execute via a single, atomic PostgreSQL stored procedure (`execute_transfer_atomic`).
+- **Row Locking**: Postgres `SELECT ... FOR UPDATE` locks wallet rows during transfers to prevent double-spending and race conditions.
+- **Strict RLS Policies**: Direct `INSERT`/`UPDATE` operations on `wallets` and `transactions` tables are prohibited for clients. Mutative operations are strictly executed via `SECURITY DEFINER` RPC functions.
+- **Idempotency Keys**: Every financial transfer accepts a unique `idempotency_key` ensuring duplicate requests (network retry / double-click) cannot cause duplicate debits.
+- **Hashed Transaction PIN**: 4-digit PINs are salted and hashed with SHA-256 before storage (`user_pins` table). Plain-text PINs are never stored or logged.
+- **Audit Logging**: Every mutation, login attempt, or transfer writes an immutable entry to an append-only `audit_logs` table.
+- **Environment Gating**: Development tools and JSON import routes (`/demo-admin`) are gated behind `ENABLE_DEMO_TOOLS=false`.
+- **Global Error Boundary**: Client-side unhandled errors are trapped gracefully with retry fallbacks (`ErrorBoundary.tsx`).
+
+---
+
+## 🛠️ Environment Configuration (`.env`)
+
+Copy `.env.example` to `.env` and populate your Supabase production credentials:
+
+```env
+# Production Mode Gating
+ENABLE_DEMO_TOOLS=false
+
+# Supabase Production Project Configuration
+EXPO_PUBLIC_SUPABASE_URL=https://izlhovwbtvappyqtvnww.supabase.co
+EXPO_PUBLIC_SUPABASE_ANON_KEY=sb_publishable_vyqdYxzft0e7v57X3U3DIA_DKl_BZAG
+
+# Optional Service Role Key (SERVER-SIDE ONLY - NEVER EXPOSE IN FRONTEND)
+SUPABASE_SECRET_KEY=your_supabase_secret_key_here
+```
+
+---
+
+## 🗄️ Database Migrations
+
+Database migrations are managed as versioned SQL scripts inside the `migrations/` directory:
+
+1. **`migrations/001_production_schema.sql`**:
+   - Creates `wallets`, `transactions`, `user_pins`, and `audit_logs` tables.
+   - Enforces Foreign Key constraints, non-negative balance checks (`balance >= 0`), positive transfer checks (`amount > 0`).
+   - Configures strict Row Level Security (RLS) policies.
+   - Creates `handle_new_user_signup()` trigger for automatic wallet allocation.
+   - Installs `execute_transfer_atomic` RPC function with `FOR UPDATE` row locking.
+
+2. **`migrations/002_wipe_test_data.sql`**:
+   - Creates backup tables (`backup_wallets`, `backup_transactions`).
+   - Safely truncates test/demo transactions and resets wallet balances.
+
+---
+
+## 🚀 Quick Start & Development
+
+### 1. Install Dependencies
 ```bash
-# Clone repository
-git clone https://github.com/Joy185c/Upay_AI_Devfest.git
-cd Upay_AI_Devfest
+npm install
+```
 
-# Start Expo Web dev server
+### 2. Run Type Check & Unit Tests
+```bash
+# TypeScript compilation check
+cmd /c npx tsc --noEmit
+
+# Jest unit test suite (14 passing tests)
+npm test
+```
+
+### 3. Start Local Web Application
+```bash
 npx expo start --web
 ```
 Open `http://localhost:8081` in your browser.
 
-### 3. Run Unit Tests
-```bash
-# Run Jest unit tests for Causal AI Math & Financial Insights
-npx jest
-```
-Runs the mathematically verified tests for **Incremental Lift %**, **iROI**, **CPIT**, **Difference-in-Differences (DiD)**, **4-Quadrant Uplift Classification**, **Summary Metrics**, **Monthly Budget Warning**, and **Category Breakdown**.
+---
+
+## 📋 Production Go-Live Checklist
+
+- [x] **Strict RLS Verification**: Verify direct `INSERT`/`UPDATE` access to `wallets` & `transactions` is disabled for `authenticated` and `anon` roles.
+- [x] **Atomic RPC Function**: Verify `execute_transfer_atomic` utilizes `SELECT ... FOR UPDATE` and checks `idempotency_key`.
+- [x] **Auth Configuration**: Enable Email + Password and Google OAuth in Supabase Auth settings.
+- [x] **Demo Gate**: Ensure `ENABLE_DEMO_TOOLS=false` in production environment variables.
+- [x] **PIN Security**: Ensure transaction PINs are stored as SHA-256 hashes and gated behind 5-attempt lockout policy.
+- [x] **Zod Input Validation**: Validate BD mobile numbers (`/^01[3-9]\d{8}$/`) and positive transfer amounts client-side and server-side.
+- [x] **Error Handling**: Verify root layout is wrapped with `ErrorBoundary`.
+- [x] **Legal & Compliance Notices**: Add Privacy Policy (`/privacy`), Terms of Service (`/terms`), Support (`/contact`), and Simulation Banner.
+- [x] **CI/CD Integration**: Verify GitHub Actions workflow (`.github/workflows/ci.yml`) passes on pull requests.
+- [x] **SEO & Web Manifest**: Configure `robots.txt` and `manifest.json`.
 
 ---
 
-## ✨ Key Features
+## 🔄 Rollback Plan
 
-### 📲 1. Simulated Payment Operations & Wallet Engine
-- **Send Money**: Real-time BD phone validation (`01XXXXXXXXX`), reference notes, free transfer charge.
-- **Mobile Recharge**: Telecom operator selection (GP, Robi, Banglalink, Airtel, Teletalk).
-- **Cash Out**: Agent cash out with standard **1.85% fee calculation** (e.g. ৳18.50 fee per ৳1,000).
-- **Add Money**: Instant wallet top-up from bank cards & apps with ৳50 ImpactIQ bonus offer.
-- **Pay Bill**: Utility bill payments (DESCO, DPDC, TITAS, WASA, Carnival) with 10% instant cashback integration.
-- **4-Step Workflow**: Input Form -> Review Screen -> Demo PIN Verification (`1234`) -> Receipt Screen.
+In case of a production defect post-deployment:
 
-### 📊 2. Financial Insights & Analytics (`/insights`)
-- **Summary Metrics**: Real-time calculation of Total Sent, Total Received, Total Fees, and Net Flow for 7d, 30d, or All Time.
-- **Spending Charts**: Interactive category breakdown chart & daily spending trend SVG chart (`react-native-svg`).
-- **Top Transacted Recipients**: Ranking list of top counterparties by transaction count and amount.
-- **Monthly Budget Limit**: Configurable monthly budget limit with real-time progress bar and **80% budget limit warning banner**.
-- **90-Day Seed Generator**: One-click generator (`SeedService`) that seeds 100+ realistic transactions spanning the past 90 days.
-
-### 📄 3. Account Statement Exports
-- **CSV Export**: Instant download of complete transaction ledger formatted as `.csv`.
-- **PDF Export**: Official print-styled Upay BD bank statement document complete with header logo, customer metrics, and itemized transaction ledger.
-
-### 🗄️ 4. Live Supabase Backend & Database Sync
-- **Supabase Integration**: Native connection to Supabase database (`@supabase/supabase-js`) for real-time wallet balance and transaction persistence.
-- **Database Schema**: SQL initialization script (`supabase_schema.sql`) for `public.wallets` and `public.transactions` tables with RLS policies enabled.
-- **Offline Fallback**: Seamless fallback to browser local storage if database is offline or unconfigured.
+1. **Vercel Rollback**:
+   - Open Vercel Dashboard -> Deployments.
+   - Select previous healthy deployment and click **Promote to Production**.
+2. **Database State Recovery**:
+   - If data corruption occurs, restore table state using `backup_wallets` and `backup_transactions` created by `migrations/002_wipe_test_data.sql`.
+   - Restore query:
+     ```sql
+     INSERT INTO public.wallets SELECT * FROM backup_wallets ON CONFLICT (user_id) DO UPDATE SET balance = EXCLUDED.balance;
+     ```
 
 ---
 
-## 🏗️ Codebase Architecture
+## ⚠️ Remaining Manual Risks & Administrative Items
 
-```text
-Upay_AI_Devfest/
-├── app/                      # Expo Router File-Based Routing
-│   ├── index.tsx             # 4-Digit PIN Auth Screen (upay Replica)
-│   ├── home.tsx              # upay Home Screen Replica (Service Grid, Banners, Floating Tiles)
-│   ├── account.tsx           # Account Screen (2x2 Pastel Wallets + Cash Reward)
-│   ├── history.tsx           # Transaction History (Grouping, Search, Receipt Modal)
-│   ├── insights.tsx          # Financial Insights, SVG Charts, Budget Warning & Exports
-│   ├── send-money.tsx        # Send Money Flow (Validation, Review, PIN 1234, Receipt)
-│   ├── topup.tsx             # Mobile Recharge Flow
-│   ├── cash-out.tsx          # Cash Out Agent Flow (1.85% Fee Calculation)
-│   ├── add-money.tsx         # Add Money Bank Card Flow
-│   ├── pay-bill.tsx          # Utility Bill-Pay Flow (10% Cashback)
-│   ├── offers.tsx            # ImpactIQ Personalized Offers ("Why this offer?")
-│   └── console/              # ImpactIQ Causal AI Marketing Console
-├── components/               # Shared UI Components & SVG Charts
-│   ├── charts/               # Custom SVG Counterfactual, Waterfall & Trend Charts
-│   ├── customer/             # upay Header, Keypad, Service Grid, Wallets, Banners
-│   └── ui/                   # BrandMark & Legal Footer
-├── lib/                      # Core Libraries
-│   ├── store.ts              # Zustand Global State Store (Balance & Transactions)
-│   └── supabase.ts           # Supabase JS SDK Client Configuration
-├── services/                 # Business Logic & Backend Services
-│   ├── transactionService.ts # Wallet Balance & Transaction Execution Engine
-│   ├── supabaseService.ts    # Supabase Database Sync Layer (wallets & transactions)
-│   ├── exportService.ts      # CSV and PDF Statement Generator
-│   ├── seedService.ts        # 90-Day Demo Transaction Seed Generator
-│   ├── paymentService.ts     # Backward-compatible payment wrapper
-│   └── upliftService.ts      # Causal AI Math & Quadrant Classifier
-├── utils/                    # Pure Calculation Helpers & Selectors
-│   ├── insightUtils.ts       # Filter, summary, trend, & monthly budget helpers
-│   └── __tests__/            # Jest Unit Tests (100% Passing)
-├── supabase_schema.sql       # Supabase Database SQL Table Creation Script
-├── .env.example              # Environment Configuration Template
-└── README.md
-```
-
----
-
-## 🗄️ Setting Up Supabase Database
-
-1. Open your project on [Supabase Dashboard](https://app.supabase.com).
-2. Go to **SQL Editor** (`>_`).
-3. Paste and run the SQL code from [`supabase_schema.sql`](file:///d:/Ai%20Hackathon/ImpactIQ/supabase_schema.sql).
-4. Configure your `.env` file with your project URL and keys:
-```env
-EXPO_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
-EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-```
+1. **Supabase Secret Key Security**:
+   - `SUPABASE_SECRET_KEY` (service role) must **NEVER** be embedded in web frontend builds or Expo client bundles. It is reserved exclusively for server-side administrative jobs.
+2. **Google OAuth Client Credentials**:
+   - Set up production Google OAuth Client ID & Secret in Supabase Auth -> Providers -> Google.
+3. **Regulatory Licensing (If transitioning to Mode B)**:
+   - Mode B (real fiat transactions) requires Bangladesh Bank PSP/PSO license, PCI-DSS compliance, and gateway merchant agreements (SSLCommerz, bKash Merchant API).
 
 ---
 
 ## ⚖️ Legal Disclaimer
 
-- This is an **unofficial AI hackathon prototype**, inspired by the upay mobile financial services (MFS) ecosystem for educational and demonstration purposes.
-- Replicates the upay app UI structure, color palette, and layout. No proprietary code or assets were used.
+Upay BD is an application prototype inspired by Bangladesh mobile financial services (MFS) interface patterns for technical simulation, demonstration, and research purposes.

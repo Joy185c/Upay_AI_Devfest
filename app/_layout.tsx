@@ -9,6 +9,8 @@ import { useAppStore } from '../lib/store';
 import { themeTokens } from '../theme/tokens';
 import { LayoutDashboard, Smartphone, Activity, Globe } from 'lucide-react-native';
 
+import { ErrorBoundary } from '../components/ErrorBoundary';
+
 export default function RootLayout() {
   const { width } = useWindowDimensions();
   const pathname = usePathname();
@@ -20,8 +22,16 @@ export default function RootLayout() {
   const isAuthRoute = pathname === '/' || pathname === '/pin';
 
   return (
-    <View style={styles.rootContainer}>
-      <StatusBar style="auto" />
+    <ErrorBoundary>
+      <View style={styles.rootContainer}>
+        <StatusBar style="auto" />
+
+        {/* Simulation Banner Notice */}
+        <View style={styles.simulationBanner}>
+          <Text style={styles.simulationBannerText}>
+            ⚠️ upay BD Simulation Environment • All balances & transactions are simulated
+          </Text>
+        </View>
 
       {isDesktop ? (
         // Universal Desktop Web Application Layout
@@ -129,6 +139,7 @@ export default function RootLayout() {
         </View>
       )}
     </View>
+    </ErrorBoundary>
   );
 }
 
@@ -136,6 +147,19 @@ const styles = StyleSheet.create({
   rootContainer: {
     flex: 1,
     backgroundColor: themeTokens.colors.creamBg,
+  },
+  simulationBanner: {
+    backgroundColor: '#FFF8CE',
+    paddingVertical: 4,
+    paddingHorizontal: 10,
+    alignItems: 'center',
+    borderBottomWidth: 1,
+    borderBottomColor: '#FDE047',
+  },
+  simulationBannerText: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: themeTokens.brand.primaryDark,
   },
   desktopContainer: {
     flex: 1,
