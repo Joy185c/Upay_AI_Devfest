@@ -1,6 +1,6 @@
-// Upay Transaction Service - Persistent Wallet & History Service Layer
 import { Transaction } from '../types';
 import { mockTransactions } from '../data/seededData';
+import { SupabaseService } from './supabaseService';
 
 export const DEFAULT_BALANCE = 10000.00;
 export const DEMO_PIN = '1234';
@@ -74,9 +74,18 @@ export class TransactionService {
   }
 
   /**
-   * Fetch current primary wallet balance
+   * Fetch current primary wallet balance (Supabase DB first, LocalStorage fallback)
    */
   async getBalance(): Promise<number> {
+    if (SupabaseService.isConnected()) {
+      const supaBal = await SupabaseService.getBalance();
+      if (supaBal !== null) {
+        memoryBalance = supaBal;
+        setStorageItem(STORAGE_BALANCE_KEY, supaBal.toString());
+        return supaBal;
+      }
+    }
+
     const saved = getStorageItem(STORAGE_BALANCE_KEY);
     if (saved !== null) {
       const parsed = parseFloat(saved);
@@ -91,18 +100,33 @@ export class TransactionService {
   }
 
   /**
-   * Set primary wallet balance
+   * Set primary wallet balance (Syncs to LocalStorage & Supabase DB)
    */
   async setBalance(balance: number): Promise<void> {
     const rounded = Math.round(balance * 100) / 100;
     memoryBalance = rounded;
     setStorageItem(STORAGE_BALANCE_KEY, rounded.toString());
+
+    if (SupabaseService.isConnected()) {
+      SupabaseService.setBalance(rounded).catch((err) =>
+        console.warn('Background Supabase balance sync warning:', err)
+      );
+    }
   }
 
   /**
-   * Fetch list of transactions, newest first
+   * Fetch list of transactions (Supabase DB first, LocalStorage fallback)
    */
   async getTransactions(): Promise<Transaction[]> {
+    if (SupabaseService.isConnected()) {
+      const supaTxs = await SupabaseService.getTransactions();
+      if (supaTxs && supaTxs.length > 0) {
+        memoryTransactions = supaTxs;
+        setStorageItem(STORAGE_TRANSACTIONS_KEY, JSON.stringify(supaTxs));
+        return supaTxs;
+      }
+    }
+
     const saved = getStorageItem(STORAGE_TRANSACTIONS_KEY);
     if (saved !== null) {
       try {
@@ -273,6 +297,12 @@ export class TransactionService {
     const list = await this.getTransactions();
     list.unshift(tx);
     await this.saveTransactions(list);
+
+    if (SupabaseService.isConnected()) {
+      SupabaseService.recordTransaction(tx).catch((err) =>
+        console.warn('Background Supabase recordTransaction warning:', err)
+      );
+    }
   }
 
   /**
